@@ -1,4 +1,5 @@
 from numpy import *
+from scipy import optimize
 
 #normalize rows without considering zeros
 def normailize(ratings, rated):
@@ -15,6 +16,31 @@ def normailize(ratings, rated):
 
 	return norm, rmean
 
+#get X and theta matrix from xtheta based on their dimensions
+def unroll(xtheta, numUsers, numRestuarants, numFeatures):
+	first30 = xtheta[:numRestuarants * numFeatures]
+	X = first30.reshape((numFeatures, numRestuarants)).transpose()
+	last18 = xtheta[numRestuarants * numFeatures:]
+	theta = last18.reshape(numFeatures, numUsers).transpose()
+
+	return X, theta
+
+#total sum of squared errors
+def getCost(xtheta, ratings, rated, numUsers, numRestuarants, numFeatures, regParam):
+	X, theta = unroll(xtheta, numUsers, numRestuarants, numFeatures)
+	cost = sum((X.dot(theta.T) * rated - ratings) ** 2) / 2
+
+	return cost
+
+#get gradient(slope)
+def getGrad(xtheta, ratings, rated, numUsers, numRestuarants, numFeatures, regParam):
+	X, theta = unroll(xtheta, numUsers, numRestuarants, numFeatures)
+	#
+	diff = X.dot(theta.T) * rated - ratings
+	Xgrad = diff.dot(theta) + regParam * X
+	thetaGrad = diff.T.dot(X) + regParam * theta
+
+	return r_[Xgrad.T.flatten(), thetaGrad.T.flatten()]
 
 #Part 1
 #input dataset
@@ -43,7 +69,38 @@ myRating[9] = 5
 
 ratings = append(myRating, ratings, axis = 1)
 rated = append(((myRating != 0) * 1), rated, axis = 1)
-print(ratings)
+
 ratings, ratingsMean = normailize(ratings, rated)
 
-print(ratings)
+#update variables
+numUsers = ratings.shape[1]
+numFeatures = 3
+
+#linear regression
+
+featureMat = random.randn(numRestuarants, numFeatures)
+preferences = random.randn(numUsers, numFeatures)
+# y = X * Theta // X = feature, Theta = user preference
+
+initXtheta = r_[featureMat.T.flatten(), preferences.T.flatten()]
+
+print(featureMat)
+print(preferences)
+
+regParam = 30
+
+minCost_optimalParams = optimize.fmin_cg(getCost, fprime=getGrad, x0=initXtheta,
+ args=(ratings, rated, numUsers, numRestuarants, regParam),
+ maxiter = 100, disp = True, full_output=True)
+
+cost, optimalfeatures = minCost_optimalParams[1], minCost_optimalParams[0]
+
+featureMat, preferences = unroll(optimalfeatures, numUsers, numRestuarants, numFeatures)
+
+print(featureMat)
+print(preferences)
+
+finalPredictions = featureMat.dot(preferences.T)
+
+myPrediction = finalPredictions[:, 0:1] + ratingsMean
+print(finalPredictions)
