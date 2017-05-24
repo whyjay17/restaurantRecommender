@@ -65,5 +65,4 @@ def rec(user):
 	finList = [i for score, i in results]
 	return finList
 		
-
-print(rec('User001'))
+print(rec('currUser'))
