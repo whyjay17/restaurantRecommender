@@ -60,9 +60,12 @@ def rec(user):
 	results = [(total/totSim[i], i) for i,total in tot.items()]
 	results.sort()
 	results.reverse()
-	print("Estimated Scores:", results)
-
+	print("------------------------------")
+	print("예상 평점:", results)
+	print("------------------------------")
 	finList = [i for score, i in results]
 	return finList
-		
-print(rec('currUser'))
+
+print("------------------------------")
+print("추천도 순서 나열 : ", rec('currUser'))
+print("------------------------------")

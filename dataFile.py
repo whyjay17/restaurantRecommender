@@ -64,4 +64,3 @@ ratings['currUser'] = {
 	'놀부부대찌개': nol
 }
 
-print(ratings['currUser'])
