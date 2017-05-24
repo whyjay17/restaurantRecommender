@@ -61,11 +61,11 @@ def rec(user):
 	results.sort()
 	results.reverse()
 	print("------------------------------")
-	print("예상 평점:", results)
+	print("<< 예상 평점 >>:", results)
 	print("------------------------------")
 	finList = [i for score, i in results]
 	return finList
 
 print("------------------------------")
-print("추천도 순서 나열 : ", rec('currUser'))
+print("<< 추천도 순서 나열 >>: ", rec('currUser'))
 print("------------------------------")
